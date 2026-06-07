@@ -48,7 +48,15 @@ class AuthController
 
         // Ищем пользователя
         $user = $this->userModel->findByEmail($email);
-        if (!$user || !Security::verifyPassword($password, $user['password'])) {
+        if (!$user) {
+            Logger::warning("Login failed: user not found for email {$email}");
+            $errors = ['auth' => ['Неверный email или пароль']];
+            require __DIR__ . '/../Views/auth/login.php';
+            return;
+        }
+
+        if (!Security::verifyPassword($password, $user['password'])) {
+            Logger::warning("Login failed: password mismatch for email {$email}");
             $errors = ['auth' => ['Неверный email или пароль']];
             require __DIR__ . '/../Views/auth/login.php';
             return;
