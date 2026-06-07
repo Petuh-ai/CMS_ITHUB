@@ -268,6 +268,10 @@ Router::get('/post/{slug}', function($slug) {
     (new FrontendController())->post($slug);
 });
 
+Router::post('/post/{slug}', function($slug) {
+    (new FrontendController())->post($slug);
+});
+
 Router::get('/category/{slug}', function($slug) {
     (new FrontendController())->category($slug);
 });

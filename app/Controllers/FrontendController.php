@@ -9,6 +9,7 @@ class FrontendController
     private $categoryModel;
     private $commentModel;
     private $settingsModel;
+    private $db;
 
     public function __construct()
     {
@@ -16,6 +17,7 @@ class FrontendController
         $this->categoryModel = new Category();
         $this->commentModel = new Comment();
         $this->settingsModel = new Settings();
+        $this->db = Database::getInstance();
     }
 
     public function index()
@@ -38,9 +40,10 @@ class FrontendController
     public function post($slug)
     {
         $post = $this->db->fetchOne(
-            "SELECT p.*, u.name as author_name
+            "SELECT p.*, u.name as author_name, c.slug as category_slug, c.name as category_name
              FROM posts p
              LEFT JOIN users u ON p.author_id = u.id
+             LEFT JOIN categories c ON p.category_id = c.id
              WHERE p.slug = ? AND p.status = 'published'
              LIMIT 1",
             [$slug]
@@ -56,7 +59,7 @@ class FrontendController
         $commentCount = $this->commentModel->countByPost($post['id']);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->addComment($post['id']);
+            $this->addComment($post['id'], $slug);
         }
 
         require __DIR__ . '/../Views/frontend/post.php';
@@ -107,7 +110,7 @@ class FrontendController
         require __DIR__ . '/../Views/frontend/search.php';
     }
 
-    private function addComment($postId)
+    private function addComment($postId, $slug)
     {
         if (!isset($_POST['csrf_token']) || !Security::verifyCSRFToken($_POST['csrf_token'])) {
             die('CSRF токен недействителен');
@@ -138,7 +141,7 @@ class FrontendController
         $this->commentModel->create($data);
         Logger::info("Comment added to post: $postId");
 
-        header("Location: /post/$slug");
+        header("Location: /post/{$slug}");
         exit;
     }
 }
