@@ -46,7 +46,20 @@ git push origin main
 5. Нажмите **"Create Database"**
 6. ⏱️ Дождитесь создания (обычно 1-2 минуты)
 
-**После создания скопируйте Connection String:**
+Если в вашем аккаунте Render нет возможности создать MySQL Database, используйте внешний MySQL-хост.
+Для бесплатного теста лучше всего подходит `db4free.net`.
+
+**Внешняя база подключается так:**
+- `DB_DRIVER=mysql`
+- `DB_HOST=db4free.net`
+- `DB_PORT=3306`
+- `DB_NAME=cms_bd`
+- `DB_USER=cms_user`
+- `DB_PASSWORD=your-password`
+
+> В `render.yaml` приложение уже готово к внешней БД через переменные окружения.
+
+Если вы создаёте базу на Render, используйте Connection String:
 - На странице БД нажмите иконку копирования рядом с **"Internal Database URL"**
 - Это строка вида: `mysql://cms_admin:PASSWORD@hostname:3306/cms_database`
 

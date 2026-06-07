@@ -3,15 +3,15 @@
  * Конфигурация базы данных
  */
 
-$driver = $_ENV['DB_DRIVER'] ?? 'pgsql';
+$driver = getenv('DB_DRIVER') ?: 'pgsql';
 
 $config = [
     'driver' => $driver,
-    'host' => $_ENV['DB_HOST'] ?? 'localhost',
-    'port' => $_ENV['DB_PORT'] ?? ($driver === 'pgsql' ? 5432 : 3306),
-    'database' => $_ENV['DB_NAME'] ?? 'cms_bd',
-    'username' => $_ENV['DB_USER'] ?? 'postgres',
-    'password' => $_ENV['DB_PASSWORD'] ?? '',
+    'host' => getenv('DB_HOST') ?: 'localhost',
+    'port' => getenv('DB_PORT') ?: ($driver === 'pgsql' ? 5432 : 3306),
+    'database' => getenv('DB_NAME') ?: 'cms_bd',
+    'username' => getenv('DB_USER') ?: 'postgres',
+    'password' => getenv('DB_PASSWORD') ?: '',
 ];
 
 // PostgreSQL специфичные параметры

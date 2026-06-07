@@ -35,12 +35,12 @@ function loadEnv(string $path): void
 
 function getDbConfig(): array
 {
-    $driver = $_ENV['DB_DRIVER'] ?? 'mysql';
-    $host = $_ENV['DB_HOST'] ?? '127.0.0.1';
-    $port = $_ENV['DB_PORT'] ?? ($driver === 'pgsql' ? 5432 : 3306);
-    $database = $_ENV['DB_NAME'] ?? 'cms_bd';
-    $username = $_ENV['DB_USER'] ?? 'root';
-    $password = $_ENV['DB_PASSWORD'] ?? '';
+    $driver = getenv('DB_DRIVER') ?: 'mysql';
+    $host = getenv('DB_HOST') ?: '127.0.0.1';
+    $port = getenv('DB_PORT') ?: ($driver === 'pgsql' ? 5432 : 3306);
+    $database = getenv('DB_NAME') ?: 'cms_bd';
+    $username = getenv('DB_USER') ?: 'root';
+    $password = getenv('DB_PASSWORD') ?: '';
 
     return compact('driver', 'host', 'port', 'database', 'username', 'password');
 }
