@@ -52,11 +52,13 @@ class Database
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::ATTR_TIMEOUT => 10,
+                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4'
             ];
-            
-            // Добавляем опции для SSL если это MySQL
-            if ($this->config['driver'] === 'mysql') {
-                $options[PDO::MYSQL_ATTR_SSL_CA] = null;
+
+            // SSL опции включаем только если явно задан путь к CA файлу
+            if ($this->config['driver'] === 'mysql' && !empty(getenv('DB_SSL_CA'))) {
+                $options[PDO::MYSQL_ATTR_SSL_CA] = getenv('DB_SSL_CA');
                 $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
             }
             
