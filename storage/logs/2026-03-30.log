@@ -1,0 +1,2 @@
+[01:41:06] [ERROR] Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'cms_db'
+[01:46:12] [INFO] User logged in: admin@example.com
