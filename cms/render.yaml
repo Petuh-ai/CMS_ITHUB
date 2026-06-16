@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: cms
+    runtime: docker
+    region: frankfurt
+    plan: free
+
+    healthCheckPath: /
+
+    envVars:
+      - key: APP_DEBUG
+        value: false
+      - key: APP_TIMEZONE
+        value: UTC
+      - key: LOG_LEVEL
+        value: info
+      - key: DB_DRIVER
+        value: mysql
+      - key: DB_HOST
+        value: sql7.freesqldatabase.com
+      - key: DB_PORT
+        value: 3306
+      - key: DB_NAME
+        value: sql7829639
+      - key: DB_USER
+        value: sql7829639
+      - key: DB_PASSWORD
+        value: Jw8hjmAdH8
+      - key: SESSION_SECURE
+        value: "true"
+      - key: SESSION_HTTPONLY
+        value: "true"
+
+    dockerfilePath: ./Dockerfile
