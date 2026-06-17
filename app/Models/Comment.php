@@ -87,5 +87,12 @@ class Comment
         );
         return $result['count'] ?? 0;
     }
-    
+    public function count()
+{
+    $result = $this->db->fetchOne(
+        "SELECT COUNT(*) as count FROM {$this->table}"
+    );
+
+    return $result['count'] ?? 0;
+}
 }
