@@ -18,19 +18,15 @@ class DashboardController
         $mediaModel = new Media();
         $commentModel = new Comment();
 
-        $stats = [
-            'total_posts' => $postModel->count(),
-            'published_posts' => $postModel->countPublished(),
-            'draft_posts' => $postModel->count('draft'),
-            'total_categories' => $categoryModel->count(),
-            'total_users' => $userModel->count(),
-            'total_media' => $mediaModel->count(),
-            'pending_comments' => $commentModel->countPending(),
-        ];
-
-        $recentPosts = $postModel->getAll(5);
-        $pendingComments = $commentModel->getPending();
-
+        // Собираем статистику
+        $totalPosts = $postModel->count();
+        $totalUsers = $userModel->count();
+        $totalComments = $commentModel->count('posts');
+        $totalCategories = $categoryModel->count();
+        
+        // Получаем последние посты
+        $recentPosts = $postModel->getAll(10);
+        
         require __DIR__ . '/../Views/admin/dashboard.php';
     }
 }
