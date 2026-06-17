@@ -1,53 +1,64 @@
 <?php
+AuthMiddleware::checkAuth();
+
 $pageTitle = 'Медиабиблиотека';
+$mediaModel = new Media();
+$media = $mediaModel->getAll(12) ?? [];
+
 ob_start();
 ?>
 
-<div class="media-page">
-    <div class="page-header">
-        <h2>Медиабиблиотека</h2>
-    </div>
+<h1>🖼️ Медиабиблиотека</h1>
 
-    <div class="media-upload">
-        <form id="uploadForm" action="/admin/media/upload" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="csrf_token" value="<?php echo Security::generateCSRFToken(); ?>">
-            <div class="upload-area" id="uploadArea">
-                <input type="file" id="fileInput" name="file" multiple accept="image/*,video/*,.pdf" style="display: none;">
-                <p>Перетащите файлы сюда или нажмите для выбора</p>
+<div class="card" style="margin-bottom: 2rem;">
+    <h3 style="margin-bottom: 1rem;">📤 Загрузить файл</h3>
+    <form action="/admin/media/upload" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="<?= Security::generateCSRFToken() ?>">
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: end;">
+            <div style="flex: 1; min-width: 250px;">
+                <input type="file" name="file" accept="image/*" required
+                       style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-md);">
             </div>
-        </form>
-    </div>
+            <button type="submit" class="btn btn-primary">Загрузить</button>
+        </div>
+    </form>
+</div>
 
-    <div class="media-grid" id="mediaGrid">
-        <?php foreach ($media as $item): ?>
-            <div class="media-item" data-id="<?php echo $item['id']; ?>">
-                <div class="media-preview">
+<?php if (!empty($media)): ?>
+    <div class="card">
+        <h3 style="margin-bottom: 1.5rem;">Загруженные файлы</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1.5rem;">
+            <?php foreach ($media as $item): ?>
+                <div style="text-align: center; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-md);">
                     <?php if (strpos($item['mime_type'], 'image') !== false): ?>
-                        <img src="/uploads/<?php echo Security::escape($item['filename']); ?>" alt="">
-                    <?php elseif (strpos($item['mime_type'], 'video') !== false): ?>
-                        <div class="video-icon">Video</div>
+                        <img src="/uploads/<?= Security::escape($item['filename']) ?>" alt="<?= Security::escape($item['original_name']) ?>"
+                             style="width: 100%; height: 150px; object-fit: cover; border-radius: var(--radius-md); margin-bottom: 0.5rem;">
                     <?php else: ?>
-                        <div class="file-icon">📄</div>
+                        <div style="width: 100%; height: 150px; background: var(--light); display: flex; align-items: center; justify-content: center; border-radius: var(--radius-md); margin-bottom: 0.5rem; font-size: 2rem;">
+                            📄
+                        </div>
                     <?php endif; ?>
+                    <p style="font-size: 0.875rem; margin: 0.5rem 0;">
+                        <?= Security::escape(substr($item['original_name'], 0, 20)) ?>
+                    </p>
+                    <small style="color: var(--text-light); display: block; margin-bottom: 0.5rem;">
+                        <?= round($item['size'] / 1024) ?> KB
+                    </small>
+                    <a href="/admin/media/<?= $item['id'] ?>/delete" class="btn btn-sm btn-danger" onclick="return confirm('Удалить?');">Удалить</a>
                 </div>
-                <div class="media-info">
-                    <p class="filename"><?php echo Security::escape($item['original_name']); ?></p>
-                    <small><?php echo round($item['size'] / 1024) . ' KB'; ?></small>
-                </div>
-                <button type="button" class="btn-delete" onclick="deleteMedia(<?php echo $item['id']; ?>)">Удалить</button>
-            </div>
-        <?php endforeach; ?>
+            <?php endforeach; ?>
+        </div>
     </div>
+<?php else: ?>
+    <div class="card" style="text-align: center; padding: 3rem;">
+        <p style="color: var(--text-light); font-size: 1.1rem;">Нет загруженных файлов</p>
+    </div>
+<?php endif; ?>
 
-    <!-- Пагинация -->
-    <?php if ($totalPages > 1): ?>
-        <div class="pagination">
-            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                <?php if ($i == $page): ?>
-                    <span class="current"><?php echo $i; ?></span>
-                <?php else: ?>
-                    <a href="/admin/media?page=<?php echo $i; ?>"><?php echo $i; ?></a>
-                <?php endif; ?>
+<?php
+$content = ob_get_clean();
+require __DIR__ . '/../../layouts/admin.php';
+?>
             <?php endfor; ?>
         </div>
     <?php endif; ?>

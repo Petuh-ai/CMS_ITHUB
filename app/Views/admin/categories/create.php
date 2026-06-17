@@ -1,44 +1,44 @@
 <?php
+AuthMiddleware::checkAuth();
+
 $pageTitle = 'Создать категорию';
+$errors = $errors ?? [];
+$categories = (new Category())->getAll();
+
 ob_start();
 ?>
 
-<div class="form-page">
-    <h2>Создать новую категорию</h2>
+<h1>📂 Создать категорию</h1>
 
-    <form method="POST" action="/admin/categories" class="form-full">
-        <input type="hidden" name="csrf_token" value="<?php echo Security::generateCSRFToken(); ?>">
+<div class="card" style="max-width: 600px;">
+    <form method="POST" action="/admin/categories">
+        <input type="hidden" name="csrf_token" value="<?= Security::generateCSRFToken() ?>">
 
-        <div class="form-group">
-            <label for="name">Название:</label>
+        <!-- НАЗВАНИЕ -->
+        <div style="margin-bottom: 1.5rem;">
+            <label for="name" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Название *</label>
             <input type="text" id="name" name="name" required 
-                   value="<?php echo Security::escape($_POST['name'] ?? ''); ?>">
+                   value="<?= Security::escape($_POST['name'] ?? '') ?>"
+                   style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-md);">
             <?php if (!empty($errors['name'])): ?>
-                <span class="error"><?php echo Security::escape($errors['name'][0]); ?></span>
+                <div style="color: var(--danger); font-size: 0.875rem; margin-top: 0.25rem;">
+                    <?= Security::escape($errors['name'][0]) ?>
+                </div>
             <?php endif; ?>
         </div>
 
-        <div class="form-group">
-            <label for="parent_id">Родительская категория:</label>
-            <select id="parent_id" name="parent_id">
-                <option value="">Нет</option>
-                <?php foreach ($categories as $category): ?>
-                    <option value="<?php echo $category['id']; ?>"
-                        <?php echo (isset($_POST['parent_id']) && $_POST['parent_id'] == $category['id']) ? 'selected' : ''; ?>>
-                        <?php echo Security::escape($category['name']); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
+        <!-- ОПИСАНИЕ -->
+        <div style="margin-bottom: 1.5rem;">
+            <label for="description" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Описание</label>
+            <textarea id="description" name="description" rows="4"
+                      style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-md);">
+<?= Security::escape($_POST['description'] ?? '') ?></textarea>
         </div>
 
-        <div class="form-group">
-            <label for="description">Описание:</label>
-            <textarea id="description" name="description" rows="5"><?php echo Security::escape($_POST['description'] ?? ''); ?></textarea>
-        </div>
-
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Создать</button>
-            <a href="/admin/categories" class="btn">Отмена</a>
+        <!-- КНОПКИ -->
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button type="submit" class="btn btn-primary">✅ Создать</button>
+            <a href="/admin/categories" class="btn btn-secondary">↩️ Отмена</a>
         </div>
     </form>
 </div>

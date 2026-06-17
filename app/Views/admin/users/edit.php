@@ -1,53 +1,75 @@
 <?php
+AuthMiddleware::checkAuth();
+
 $pageTitle = 'Редактировать пользователя';
+$errors = $errors ?? [];
+
 ob_start();
 ?>
 
-<div class="form-page">
-    <h2>Редактировать пользователя</h2>
+<h1>✏️ Редактировать пользователя</h1>
 
-    <form method="POST" action="/admin/users/<?php echo $user['id']; ?>" class="form-full">
-        <input type="hidden" name="csrf_token" value="<?php echo Security::generateCSRFToken(); ?>">
+<div class="card" style="max-width: 600px;">
+    <form method="POST" action="/admin/users/<?= $user['id'] ?>">
+        <input type="hidden" name="csrf_token" value="<?= Security::generateCSRFToken() ?>">
 
-        <div class="form-group">
-            <label for="name">Имя:</label>
+        <!-- ИМЯ -->
+        <div style="margin-bottom: 1.5rem;">
+            <label for="name" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Имя *</label>
             <input type="text" id="name" name="name" required 
-                   value="<?php echo Security::escape($_POST['name'] ?? $user['name']); ?>">
+                   value="<?= Security::escape($_POST['name'] ?? $user['name']) ?>"
+                   style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-md);">
             <?php if (!empty($errors['name'])): ?>
-                <span class="error"><?php echo Security::escape($errors['name'][0]); ?></span>
+                <div style="color: var(--danger); font-size: 0.875rem; margin-top: 0.25rem;">
+                    <?= Security::escape($errors['name'][0]) ?>
+                </div>
             <?php endif; ?>
         </div>
 
-        <div class="form-group">
-            <label for="email">Email:</label>
+        <!-- EMAIL -->
+        <div style="margin-bottom: 1.5rem;">
+            <label for="email" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Email *</label>
             <input type="email" id="email" name="email" required 
-                   value="<?php echo Security::escape($_POST['email'] ?? $user['email']); ?>">
+                   value="<?= Security::escape($_POST['email'] ?? $user['email']) ?>"
+                   style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-md);">
             <?php if (!empty($errors['email'])): ?>
-                <span class="error"><?php echo Security::escape($errors['email'][0]); ?></span>
+                <div style="color: var(--danger); font-size: 0.875rem; margin-top: 0.25rem;">
+                    <?= Security::escape($errors['email'][0]) ?>
+                </div>
             <?php endif; ?>
         </div>
 
-        <div class="form-group">
-            <label for="password">Новый пароль (оставьте пустым, если не хотите менять):</label>
-            <input type="password" id="password" name="password">
+        <!-- ПАРОЛЬ -->
+        <div style="margin-bottom: 1.5rem;">
+            <label for="password" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Новый пароль</label>
+            <input type="password" id="password" name="password"
+                   style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-md);">
+            <small style="color: var(--text-light);">Оставьте пустым, если не хотите менять пароль</small>
         </div>
 
-        <div class="form-group">
-            <label for="role">Роль:</label>
-            <select id="role" name="role" required>
-                <option value="author" <?php echo ($user['role'] === 'author') ? 'selected' : ''; ?>>Автор</option>
-                <option value="editor" <?php echo ($user['role'] === 'editor') ? 'selected' : ''; ?>>Редактор</option>
-                <option value="admin" <?php echo ($user['role'] === 'admin') ? 'selected' : ''; ?>>Администратор</option>
+        <!-- РОЛЬ -->
+        <div style="margin-bottom: 1.5rem;">
+            <label for="role" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Роль *</label>
+            <select id="role" name="role" required
+                    style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-md);">
+                <option value="user" <?= ($user['role'] === 'user') ? 'selected' : '' ?>>📝 Автор</option>
+                <option value="editor" <?= ($user['role'] === 'editor') ? 'selected' : '' ?>>✏️ Редактор</option>
+                <option value="admin" <?= ($user['role'] === 'admin') ? 'selected' : '' ?>>👑 Администратор</option>
             </select>
         </div>
 
-        <div class="form-group">
-            <label for="status">Статус:</label>
-            <select id="status" name="status">
-                <option value="active" <?php echo ($user['status'] === 'active') ? 'selected' : ''; ?>>Активен</option>
-                <option value="inactive" <?php echo ($user['status'] === 'inactive') ? 'selected' : ''; ?>>Неактивен</option>
-                <option value="suspended" <?php echo ($user['status'] === 'suspended') ? 'selected' : ''; ?>>Заморожен</option>
-            </select>
+        <!-- КНОПКИ -->
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button type="submit" class="btn btn-primary">💾 Сохранить</button>
+            <a href="/admin/users" class="btn btn-secondary">↩️ Отмена</a>
+        </div>
+    </form>
+</div>
+
+<?php
+$content = ob_get_clean();
+require __DIR__ . '/../../layouts/admin.php';
+?>
         </div>
 
         <div class="form-actions">
