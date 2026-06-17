@@ -49,6 +49,7 @@ require_once __DIR__ . '/app/Logger.php';
 require_once __DIR__ . '/app/Validator.php';
 require_once __DIR__ . '/app/Security.php';
 require_once __DIR__ . '/app/Router.php';
+require_once __DIR__ . '/app/DatabaseMigration.php';
 
 // Подключаем модели
 require_once __DIR__ . '/app/Models/User.php';
@@ -57,6 +58,13 @@ require_once __DIR__ . '/app/Models/Category.php';
 require_once __DIR__ . '/app/Models/Media.php';
 require_once __DIR__ . '/app/Models/Comment.php';
 require_once __DIR__ . '/app/Models/Settings.php';
+
+// Выполняем миграции при запуске
+try {
+    (new DatabaseMigration())->migrate();
+} catch (Exception $e) {
+    Logger::error('Database migration failed: ' . $e->getMessage());
+}
 
 // Создаём дефолтного администратора, если ещё нет
 try {

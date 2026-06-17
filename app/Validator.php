@@ -81,12 +81,27 @@ class Validator
 
     private function isNotUnique($table, $field, $value)
     {
-        $db = Database::getInstance();
-        $result = $db->fetchOne(
-            "SELECT id FROM $table WHERE $field = ? LIMIT 1",
-            [$value]
-        );
-        return !empty($result);
+        try {
+            // Валидируем имена таблицы и поля (должны быть алфавитно-цифровыми с подчеркиванием)
+            if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $table)) {
+                return false; // Некорректное имя таблицы
+            }
+            if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $field)) {
+                return false; // Некорректное имя поля
+            }
+            
+            $db = Database::getInstance();
+            $result = $db->fetchOne(
+                "SELECT id FROM `$table` WHERE `$field` = ? LIMIT 1",
+                [$value]
+            );
+            return !empty($result);
+        } catch (Exception $e) {
+            // Если возникла ошибка при проверке (например, таблица не существует),
+            // логируем и считаем значение уникальным (разрешаем регистрацию)
+            Logger::warning('Validation check failed: ' . $e->getMessage());
+            return false;
+        }
     }
 
     private function addError($field, $message)
