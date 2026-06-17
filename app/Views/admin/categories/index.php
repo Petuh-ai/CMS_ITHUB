@@ -1,24 +1,30 @@
 <?php
-$pageTitle = 'Категории';
+AuthMiddleware::checkAuth();
+
+$pageTitle = 'Управление категориями';
+$error = $error ?? null;
+$categories = (new Category())->getAll();
+
 ob_start();
 ?>
 
-<div class="categories-page">
-    <div class="page-header">
-        <h2>Категории</h2>
-        <a href="/admin/categories/create" class="btn btn-primary">Создать категорию</a>
+<h1>📂 Управление категориями</h1>
+
+<a href="/admin/categories/create" class="btn btn-primary" style="margin-bottom: 1.5rem;">➕ Создать категорию</a>
+
+<?php if (!empty($error)): ?>
+    <div style="padding: 1rem; background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+        ❌ <?= Security::escape($error) ?>
     </div>
+<?php endif; ?>
 
-    <?php if (!empty($error)): ?>
-        <div class="alert alert-danger"><?php echo Security::escape($error); ?></div>
-    <?php endif; ?>
-
+<div class="card">
     <table class="table">
         <thead>
             <tr>
                 <th>Название</th>
                 <th>Описание</th>
-                <th>Постов</th>
+                <th style="text-align: center;">Постов</th>
                 <th>Действия</th>
             </tr>
         </thead>
@@ -29,16 +35,23 @@ ob_start();
                     ?>
                     <tr>
                         <td>
-                            <span style="margin-left: <?php echo ($level * 20); ?>px;">
-                                <?php echo Security::escape($category['name']); ?>
+                            <div style="margin-left: <?= ($level * 20) ?>px;">
+                                <?= str_repeat('↳ ', $level) . Security::escape($category['name']) ?>
+                            </div>
+                        </td>
+                        <td style="color: var(--text-light);">
+                            <?= Security::escape(substr($category['description'] ?? '', 0, 50)) ?>
+                        </td>
+                        <td style="text-align: center;">
+                            <span style="display: inline-block; padding: 0.25rem 0.75rem; background: var(--light); border-radius: var(--radius-sm);">
+                                <?= $category['post_count'] ?? 0 ?>
                             </span>
                         </td>
-                        <td><?php echo Security::escape(substr($category['description'] ?? '', 0, 50)); ?></td>
-                        <td><?php echo $category['post_count'] ?? 0; ?></td>
                         <td>
-                            <a href="/admin/categories/<?php echo $category['id']; ?>/edit" class="btn-link">Редактировать</a>
-                            <a href="/admin/categories/<?php echo $category['id']; ?>/delete" class="btn-link btn-danger"
-                               onclick="return confirm('Вы уверены?');">Удалить</a>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <a href="/admin/categories/<?= $category['id'] ?>/edit" class="btn btn-sm btn-primary">Редактировать</a>
+                                <a href="/admin/categories/<?= $category['id'] ?>/delete" class="btn btn-sm btn-danger" onclick="return confirm('Удалить?');">Удалить</a>
+                            </div>
                         </td>
                     </tr>
                     <?php
@@ -48,6 +61,15 @@ ob_start();
                 }
             };
             $printCategory($categories);
+            ?>
+        </tbody>
+    </table>
+</div>
+
+<?php
+$content = ob_get_clean();
+require __DIR__ . '/../../layouts/admin.php';
+?>
             ?>
         </tbody>
     </table>
